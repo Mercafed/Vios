@@ -20,7 +20,7 @@ export function ProductModal({ product, onClose }: ProductModalProps) {
 
   return (
     <Dialog open={true} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl">{product.name}</DialogTitle>
         </DialogHeader>
@@ -29,6 +29,17 @@ export function ProductModal({ product, onClose }: ProductModalProps) {
           <div>
             <Badge>{statusLabels[product.status]}</Badge>
           </div>
+
+          {product.screenshot_url && (
+            <div className="space-y-2">
+              <h3 className="font-semibold">Captura del Producto</h3>
+              <img
+                src={product.screenshot_url || "/placeholder.svg"}
+                alt={product.name}
+                className="w-full rounded-lg border"
+              />
+            </div>
+          )}
 
           {product.description && (
             <div>
@@ -45,7 +56,7 @@ export function ProductModal({ product, onClose }: ProductModalProps) {
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Valor:</span>
-                  <span className="font-medium">${product.total_value.toLocaleString("es-CO")}</span>
+                  <span className="font-medium">${product.total_value.toLocaleString("es-CO")} COP</span>
                 </div>
                 {product.estimated_arrival && (
                   <div className="flex justify-between">

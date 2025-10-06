@@ -55,8 +55,10 @@ export async function POST(request: Request) {
         isAdmin: user.role === "admin",
       },
     })
-  } catch (error) {
-    console.error("[v0] Login error:", error)
-    return NextResponse.json({ error: "Error al iniciar sesión" }, { status: 500 })
-  }
+  } catch (error: any) {
+  console.error("[v0] Login error:", error?.message, error?.stack)
+  return NextResponse.json(
+    { error: "Error al iniciar sesión", details: error?.message },
+    { status: 500 }
+  )
 }

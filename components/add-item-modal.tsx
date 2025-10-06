@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useToast } from "@/hooks/use-toast"
+import { Upload } from "lucide-react"
 
 interface AddItemModalProps {
   onClose: () => void
@@ -20,6 +21,8 @@ export function AddItemModal({ onClose, onSuccess }: AddItemModalProps) {
   const { toast } = useToast()
   const [stores, setStores] = useState<any[]>([])
   const [categories, setCategories] = useState<any[]>([])
+  const [screenshot, setScreenshot] = useState<File | null>(null)
+  const [uploading, setUploading] = useState(false)
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -40,14 +43,34 @@ export function AddItemModal({ onClose, onSuccess }: AddItemModalProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setUploading(true)
 
     try {
+      let screenshotUrl = null
+
+      if (screenshot) {
+        const formDataUpload = new FormData()
+        formDataUpload.append("file", screenshot)
+        formDataUpload.append("productName", formData.name)
+
+        const uploadResponse = await fetch("/api/upload-screenshot", {
+          method: "POST",
+          body: formDataUpload,
+        })
+
+        if (uploadResponse.ok) {
+          const uploadData = await uploadResponse.json()
+          screenshotUrl = uploadData.url
+        }
+      }
+
       await fetch("/api/products/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...formData,
           status: "por_pedir",
+          screenshotUrl,
         }),
       })
 
@@ -64,6 +87,8 @@ export function AddItemModal({ onClose, onSuccess }: AddItemModalProps) {
         description: "No se pudo agregar el item",
         variant: "destructive",
       })
+    } finally {
+      setUploading(false)
     }
   }
 
@@ -93,6 +118,30 @@ export function AddItemModal({ onClose, onSuccess }: AddItemModalProps) {
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               rows={3}
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="screenshot">Captura del Producto</Label>
+            <div className="flex items-center gap-2">
+              <Input
+                id="screenshot"
+                type="file"
+                accept="image/*"
+                onChange={(e) => setScreenshot(e.target.files?.[0] || null)}
+                className="flex-1"
+              />
+              {screenshot && (
+                <Button type="button" variant="outline" size="sm" onClick={() => setScreenshot(null)}>
+                  Quitar
+                </Button>
+              )}
+            </div>
+            {screenshot && (
+              <p className="text-sm text-muted-foreground">
+                <Upload className="w-3 h-3 inline mr-1" />
+                {screenshot.name}
+              </p>
+            )}
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
@@ -154,10 +203,10 @@ export function AddItemModal({ onClose, onSuccess }: AddItemModalProps) {
           </div>
 
           <div className="flex gap-4">
-            <Button type="submit" className="flex-1">
-              Agregar
+            <Button type="submit" className="flex-1" disabled={uploading}>
+              {uploading ? "Subiendo..." : "Agregar"}
             </Button>
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button type="button" variant="outline" onClick={onClose} disabled={uploading}>
               Cancelar
             </Button>
           </div>

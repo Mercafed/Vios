@@ -28,7 +28,10 @@ export function AppHeader({ balance, userName, isAdmin }: AppHeaderProps) {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80">
       <div className="container flex h-16 items-center justify-between px-4">
-        <div className="flex items-center gap-2">
+        <div
+          className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
+          onClick={() => router.push("/dashboard")}
+        >
           <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
             <Package className="w-5 h-5 text-primary" />
           </div>
