@@ -35,6 +35,10 @@ export async function POST(request: Request) {
     // Verify password
     const isValid = await verifyPassword(password, user.password_hash)
 
+    console.log("Password recibido:", password)
+    console.log("Hash esperado:", user.password_hash)
+    console.log("Hash calculado:", await hashPassword(password))
+
     if (!isValid) {
       return NextResponse.json({ error: "Usuario o contraseña incorrectos" }, { status: 401 })
     }
