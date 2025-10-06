@@ -8,7 +8,7 @@ export async function POST(request: Request) {
   try {
     const { username, password } = await request.json()
 
-    console.log("Intentando login con:", username, password)
+    console.log("🟢 Datos recibidos en /api/auth/login:", { username, password })
 
     if (!username || !password) {
       return NextResponse.json({ error: "Usuario y contraseña son requeridos" }, { status: 400 })

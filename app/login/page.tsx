@@ -17,6 +17,7 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
+    console.log("🔵 Enviando login:", { username, password })
     e.preventDefault()
     setError("")
     setIsLoading(true)
